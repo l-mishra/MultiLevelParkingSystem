@@ -20,4 +20,9 @@ public class SlotRepository implements ISlotRepository<Slot> {
     return slots;
   }
 
+  @Override
+  public void init(List<Slot> slots) {
+    this.slots = slots;
+  }
+
 }

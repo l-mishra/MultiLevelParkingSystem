@@ -11,6 +11,7 @@ import com.lokesh.parkinglot.repository.IInvoiceRepository;
 import com.lokesh.parkinglot.repository.ITicketRepository;
 import com.lokesh.parkinglot.service.IPaymentCalculator;
 import com.lokesh.parkinglot.service.ITicketBookingService;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,5 +62,18 @@ public class TicketBookingService implements ITicketBookingService {
     invoice.setAmount(amount);
     invoiceRepository.saveInvoice(invoice);
     return invoice;
+  }
+
+  public List<Ticket> getParkedVehicleByColor(String color) {
+    List<Ticket> parkedVehicles = ticketRepository.getTicketsByStatus("PARKED");
+    return parkedVehicles.stream().filter(ticket -> color.equals(ticket.getVehicleColor()))
+        .toList();
+  }
+
+  public Ticket getParkedVehicleByRegNumber(String regNo) {
+    List<Ticket> parkedVehicles = ticketRepository.getTicketsByStatus("PARKED");
+    return parkedVehicles.stream().filter(ticket -> regNo.equals(ticket.getVehicleColor()))
+        .findFirst().orElse(null);
+
   }
 }

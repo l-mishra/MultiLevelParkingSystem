@@ -8,20 +8,36 @@ import static java.util.Objects.requireNonNull;
 import com.lokesh.parkinglot.bo.Location;
 import com.lokesh.parkinglot.bo.Slot;
 import com.lokesh.parkinglot.bo.Vehicle.VehicleType;
+import com.lokesh.parkinglot.repository.ISlotRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SlotManager {
 
+  private final ISlotRepository slotRepository;
+
   private ConcurrentSkipListMap<Location, Slot> smallAvailableSlots = new ConcurrentSkipListMap<>();
   private ConcurrentSkipListMap<Location, Slot> mediumAvailableSlots = new ConcurrentSkipListMap<>();
   private ConcurrentSkipListMap<Location, Slot> largeAvailableSlots = new ConcurrentSkipListMap<>();
   private ConcurrentSkipListMap<Integer, Slot> bookedSlots = new ConcurrentSkipListMap<>();
+
+  @Autowired
+  public SlotManager(ISlotRepository slotRepository) {
+    this.slotRepository = slotRepository;
+  }
+
+  public void init() {
+    List<Slot> slots = slotRepository.getAllSlots();
+    slots.forEach(slot -> largeAvailableSlots.put(slot.getLocation(), slot));
+  }
 
   public Slot allocateSlot(VehicleType vehicleType, Location location) {
     Slot pickedSlot = null;

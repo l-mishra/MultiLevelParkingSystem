@@ -1,7 +1,10 @@
 package com.lokesh.parkinglot.repository;
 
+import static java.util.stream.Collectors.toList;
+
 import com.lokesh.parkinglot.bo.Ticket;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +21,12 @@ public class TicketRepository implements ITicketRepository {
   @Override
   public Ticket getTicketById(String ticketId) {
     return tickets.get(ticketId);
+  }
+
+  @Override
+  public List<Ticket> getTicketsByStatus(String ticketStatus) {
+    return tickets.values().stream()
+        .filter(ticket -> ticket.getBookingStatus().equals(ticketStatus)).collect(toList());
   }
 
 
