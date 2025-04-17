@@ -44,8 +44,11 @@ public class PaymentCalculator implements IPaymentCalculator {
   }
 
   public int calculateDeltaHours(long durationInMs) {
-    return (int) (durationInMs / MILLISECONDS_IN_HOURS) + (int) (durationInMs
-        % MILLISECONDS_IN_HOURS);
+    //complete hours
+    int completeHours = (int) (durationInMs / MILLISECONDS_IN_HOURS);
+    // account for extra minutes/seconds   % MILLISECONDS_IN_HOURS) > 0 ? 1 : 0;
+    int extraMins = (durationInMs% MILLISECONDS_IN_HOURS) > 0 ? 1 : 0;
+    return completeHours + extraMins;
   }
 
 }

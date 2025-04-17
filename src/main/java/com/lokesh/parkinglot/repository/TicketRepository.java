@@ -29,5 +29,10 @@ public class TicketRepository implements ITicketRepository {
         .filter(ticket -> ticket.getBookingStatus().equals(ticketStatus)).collect(toList());
   }
 
+  @Override
+  public void reset(){
+    tickets = new HashMap<>();
+  }
+
 
 }

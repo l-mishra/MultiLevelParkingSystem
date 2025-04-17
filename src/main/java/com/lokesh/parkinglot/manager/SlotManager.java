@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,8 +71,9 @@ public class SlotManager {
         } else {
           largeAvailableSlots.remove(closestSlotEntry.getKey());
         }
-        bookedSlots.put(pickedSlot.getSlotId(), pickedSlot);
       }
+      bookedSlots.put(pickedSlot.getSlotId(), pickedSlot);
+      return pickedSlot;
     }
   }
 
@@ -90,7 +89,7 @@ public class SlotManager {
       addIntoList(mediumAvailableSlots.floorEntry(location), slotEntries);
     }
     addIntoList(largeAvailableSlots.ceilingEntry(location), slotEntries);
-    addIntoList(smallAvailableSlots.floorEntry(location), slotEntries);
+    addIntoList(largeAvailableSlots.floorEntry(location), slotEntries);
 
     Entry<Location, Slot> closestEntry = getClosestEntryByLocations(slotEntries, location);
     return closestEntry;
@@ -109,7 +108,7 @@ public class SlotManager {
     int minDistance = Integer.MAX_VALUE;
     for (Entry<Location, Slot> currentEntry : slotsEntries) {
       int currDistance = getDistance(location, currentEntry.getKey());
-      if (currDistance > minDistance) {
+      if (currDistance < minDistance) {
         minDistance = currDistance;
         selectedEntry = currentEntry;
       }
@@ -142,5 +141,12 @@ public class SlotManager {
     } else if (slot.getAllowedType() == MEDIUM) {
       mediumAvailableSlots.put(slot.getLocation(), slot);
     }
+  }
+
+  public void reset(){
+    largeAvailableSlots.clear();
+    mediumAvailableSlots.clear();
+    smallAvailableSlots.clear();
+    bookedSlots.clear();
   }
 }

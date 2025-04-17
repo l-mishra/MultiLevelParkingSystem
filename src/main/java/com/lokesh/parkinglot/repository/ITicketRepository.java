@@ -10,4 +10,6 @@ public interface ITicketRepository {
   Ticket getTicketById(String ticketId);
 
   List<Ticket> getTicketsByStatus(String ticketStatus);
+
+  void reset();
 }

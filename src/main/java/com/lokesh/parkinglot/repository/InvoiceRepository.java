@@ -1,13 +1,14 @@
 package com.lokesh.parkinglot.repository;
 
 import com.lokesh.parkinglot.bo.Invoice;
+import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class InvoiceRepository implements IInvoiceRepository {
 
-  private Map<String, Invoice> invoices;
+  private Map<String, Invoice> invoices = new HashMap<>();
 
   @Override
   public void saveInvoice(Invoice invoice) {

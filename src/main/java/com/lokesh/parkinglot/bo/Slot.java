@@ -6,10 +6,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Builder
 @Getter
 @Setter
+@ToString
 public class Slot {
 
   private int slotId;
@@ -38,6 +40,9 @@ public class Slot {
   }
 
   public boolean isFullyOccupied() {
+    if(allowedType == null){
+      return false;
+    }
     return switch (allowedType) {
       case SMALL -> parkedCount.get() == 4;
       case MEDIUM -> parkedCount.get() == 2;

@@ -6,6 +6,7 @@ import com.lokesh.parkinglot.bo.Slot;
 import com.lokesh.parkinglot.bo.Ticket;
 import com.lokesh.parkinglot.bo.Vehicle;
 import com.lokesh.parkinglot.bo.Vehicle.VehicleType;
+import com.lokesh.parkinglot.exception.SlotUnAvailableException;
 import com.lokesh.parkinglot.manager.SlotManager;
 import com.lokesh.parkinglot.repository.IInvoiceRepository;
 import com.lokesh.parkinglot.repository.ITicketRepository;
@@ -35,14 +36,18 @@ public class TicketBookingService implements ITicketBookingService {
 
   @Override
   public Ticket bookTicket(Vehicle vehicle, Location location) {
+
     Slot slot = slotManager.allocateSlot(vehicle.getVehicleType(), location);
+    if (slot == null) {
+      throw new SlotUnAvailableException("Slot not avaialbe");
+    }
     Ticket ticket = new Ticket();
     ticket.setSlotTime(System.currentTimeMillis());
     ticket.setId(UUID.randomUUID().toString());
     ticket.setSlotId(slot.getSlotId());
     ticket.setVehicleColor(vehicle.getColor());
     ticket.setRegNumber(vehicle.getRegNo());
-    ticket.setBookingStatus("INPROG");
+    ticket.setBookingStatus("PARKED");
     ticket.setVehicleType(vehicle.getVehicleType().name());
     ticketRepository.saveTicket(ticket);
     return ticket;
@@ -64,16 +69,26 @@ public class TicketBookingService implements ITicketBookingService {
     return invoice;
   }
 
-  public List<Ticket> getParkedVehicleByColor(String color) {
+  @Override
+  public List<Ticket> getParkedVehicleListByColor(String color) {
     List<Ticket> parkedVehicles = ticketRepository.getTicketsByStatus("PARKED");
     return parkedVehicles.stream().filter(ticket -> color.equals(ticket.getVehicleColor()))
         .toList();
   }
 
-  public Ticket getParkedVehicleByRegNumber(String regNo) {
+  @Override
+  public Integer getSlotByRegNumber(String regNo) {
     List<Ticket> parkedVehicles = ticketRepository.getTicketsByStatus("PARKED");
-    return parkedVehicles.stream().filter(ticket -> regNo.equals(ticket.getVehicleColor()))
+    return parkedVehicles.stream().filter(ticket -> regNo.equals(ticket.getRegNumber()))
+        .map(Ticket::getSlotId)
         .findFirst().orElse(null);
 
+  }
+
+  @Override
+  public List<Integer> getSlotsByParkedVehicleColor(String color) {
+    List<Ticket> parkedVehicles = ticketRepository.getTicketsByStatus("PARKED");
+    return parkedVehicles.stream().filter(ticket -> color.equals(ticket.getVehicleColor()))
+        .map(Ticket::getSlotId).toList();
   }
 }
